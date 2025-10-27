@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "Du är en hjälpsam AI-röstassistent för frisörsalonger." },
         { role: "user", content: userPrompt },
