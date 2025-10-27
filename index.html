@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Demo</title>
+</head>
+<body>
+  <h1>Welcome to the AI Demo</h1>
+  <p>Type a message below and see the AI respond:</p>
+  <textarea id="userInput" rows="4" cols="50"></textarea><br>
+  <button id="sendBtn">Send</button>
+  <pre id="aiResponse"></pre>
+
+  <script>
+    const sendBtn = document.getElementById('sendBtn');
+    const userInput = document.getElementById('userInput');
+    const aiResponse = document.getElementById('aiResponse');
+
+    sendBtn.addEventListener('click', async () => {
+      const message = userInput.value;
+      if (!message) return;
+      
+      // Here we'll call your backend / API
+      // For now, just simulate response
+      aiResponse.textContent = "AI says: " + message.split('').reverse().join('');
+    });
+  </script>
+</body>
+</html>
