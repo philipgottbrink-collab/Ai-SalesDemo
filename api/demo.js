@@ -6,19 +6,27 @@ const openai = new OpenAI({
 
 export default async function handler(req, res) {
   try {
-    // Example prompt for demo purposes
-    const demoPrompt = `Hej! Detta är en demo för din AI-röstassistent.`;
+    let userPrompt;
 
-    // Call OpenAI
+    if (req.method === "POST") {
+      // Use the prompt sent from the frontend
+      const body = await req.json();
+      userPrompt = body.prompt;
+    }
+
+    // If no prompt provided, use demo text
+    if (!userPrompt) {
+      userPrompt = "Hej! Detta är en demo för din AI-röstassistent.";
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: "Du är en hjälpsam AI-röstassistent för frisörsalonger." },
-        { role: "user", content: demoPrompt }
+        { role: "user", content: userPrompt }
       ],
     });
 
-    // Return the AI's response
     res.status(200).json({ message: completion.choices[0].message.content });
   } catch (err) {
     console.error(err);
