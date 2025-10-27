@@ -8,7 +8,7 @@
 <body>
   <h1>AI Demo</h1>
 
-  <!-- Prompt input -->
+  <!-- Custom prompt input -->
   <textarea id="prompt" rows="10" cols="50" placeholder="Skriv ditt prompt här…"></textarea><br>
   <button id="sendBtn">Skicka till AI</button>
 
@@ -19,26 +19,26 @@
   <pre id="response"></pre>
 
   <script>
-    // Event for sending your custom prompt to your /ask endpoint
+    // Event for sending user prompt to /api/demo
     document.getElementById("sendBtn").addEventListener("click", async () => {
       const prompt = document.getElementById("prompt").value;
       const responseEl = document.getElementById("response");
 
       try {
-        const res = await fetch("/ask", {
+        const res = await fetch("/api/demo", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt })
         });
         const data = await res.json();
-        responseEl.textContent = data.response;
+        responseEl.textContent = data.message;
       } catch (err) {
         console.error(err);
         responseEl.textContent = "Error: " + err.message;
       }
     });
 
-    // Event for demo button calling /api/demo serverless function
+    // Event for demo button calling /api/demo with a predefined demo prompt
     document.getElementById("demoBtn").addEventListener("click", async () => {
       const responseEl = document.getElementById("response");
 
