@@ -10,9 +10,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Put your OpenAI API key in an environment variable called OPENAI_API_KEY
+// Use the environment variable you created in Vercel
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPEN_AI_KEY, // <-- updated here
 });
 const openai = new OpenAIApi(configuration);
 
