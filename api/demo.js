@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPEN_AI_KEY, // Make sure your API key is set in Vercel Environment Variables
+  apiKey: process.env.OPEN_AI_KEY, // Make sure your key in Vercel matches this
 });
 
 export default async function handler(req, res) {
@@ -9,12 +9,12 @@ export default async function handler(req, res) {
     let userPrompt;
 
     if (req.method === "POST") {
-      // Use the prompt sent from the frontend
-      const body = await req.json();
-      userPrompt = body.prompt;
+      // ✅ Correct way: read the parsed body
+      const { prompt } = req.body || {};
+      userPrompt = prompt;
     }
 
-    // If no prompt provided, use demo text
+    // Default demo prompt if nothing provided
     if (!userPrompt) {
       userPrompt = "Hej! Detta är en demo för din AI-röstassistent.";
     }
