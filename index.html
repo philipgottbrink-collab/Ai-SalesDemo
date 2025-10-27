@@ -7,12 +7,19 @@
 </head>
 <body>
   <h1>AI Demo</h1>
+
+  <!-- Prompt input -->
   <textarea id="prompt" rows="10" cols="50" placeholder="Skriv ditt prompt här…"></textarea><br>
   <button id="sendBtn">Skicka till AI</button>
+
+  <!-- Demo button for testing serverless function -->
+  <button id="demoBtn">Kör Demo</button>
+
   <h2>Respons:</h2>
   <pre id="response"></pre>
 
   <script>
+    // Event for sending your custom prompt to your /ask endpoint
     document.getElementById("sendBtn").addEventListener("click", async () => {
       const prompt = document.getElementById("prompt").value;
       const responseEl = document.getElementById("response");
@@ -25,6 +32,20 @@
         });
         const data = await res.json();
         responseEl.textContent = data.response;
+      } catch (err) {
+        console.error(err);
+        responseEl.textContent = "Error: " + err.message;
+      }
+    });
+
+    // Event for demo button calling /api/demo serverless function
+    document.getElementById("demoBtn").addEventListener("click", async () => {
+      const responseEl = document.getElementById("response");
+
+      try {
+        const res = await fetch("/api/demo");
+        const data = await res.json();
+        responseEl.textContent = data.message;
       } catch (err) {
         console.error(err);
         responseEl.textContent = "Error: " + err.message;
