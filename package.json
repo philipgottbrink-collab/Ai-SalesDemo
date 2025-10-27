@@ -3,13 +3,10 @@
   "version": "1.0.0",
   "description": "Demo site for AI voice assistant",
   "type": "module",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "vercel dev"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "openai": "^4.35.0",
-    "cors": "^2.8.5"
+    "openai": "^4.35.0"
   }
 }
