@@ -3,27 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Demo</title>
+  <title>AI Assistent</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #0a0a0a;
+      color: #fff;
+      font-family: "Courier New", monospace;
+      background-image: radial-gradient(#111 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      letter-spacing: 2px;
+    }
+
+    .talk-button {
+      background-color: #fefae0;
+      color: #000;
+      font-size: 1.2rem;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      position: relative;
+    }
+
+    .talk-button:hover {
+      transform: scale(1.05);
+    }
+
+    .color-bars {
+      display: flex;
+      gap: 8px;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .bar {
+      width: 25px;
+      height: 10px;
+      border-radius: 5px;
+      animation: bounce 1.5s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* Responsivitet */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.2rem;
+      }
+      .talk-button {
+        width: 80%;
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>AI Demo</h1>
+  <h1>🟢 Tala med AI</h1>
 
-  <!-- Custom prompt input -->
-  <textarea id="prompt" rows="10" cols="50" placeholder="Skriv ditt prompt här…"></textarea><br>
-  <button id="sendBtn">Skicka till AI</button>
+  <button class="talk-button" id="talkBtn">🎙️ Tryck för att prata</button>
 
-  <!-- Demo button for testing serverless function -->
-  <button id="demoBtn">Kör Demo</button>
+  <div class="color-bars" id="bars">
+    <div class="bar" style="background-color:#ffcc00;"></div>
+    <div class="bar" style="background-color:#00ccff;"></div>
+    <div class="bar" style="background-color:#ff66cc;"></div>
+    <div class="bar" style="background-color:#66ff66;"></div>
+    <div class="bar" style="background-color:#ff9966;"></div>
+    <div class="bar" style="background-color:#ccccff;"></div>
+  </div>
 
-  <h2>Respons:</h2>
-  <pre id="response"></pre>
+  <pre id="response" style="margin-top:2rem; white-space:pre-wrap; max-width:90%; text-align:center;"></pre>
 
   <script>
-    // Event for sending user prompt to /api/demo
-    document.getElementById("sendBtn").addEventListener("click", async () => {
-      const prompt = document.getElementById("prompt").value;
-      const responseEl = document.getElementById("response");
+    const talkBtn = document.getElementById("talkBtn");
+    const responseEl = document.getElementById("response");
 
+    let listening = false;
+    let recognition;
+
+    // Kontrollera om webbläsaren stödjer röstigenkänning
+    if ("webkitSpeechRecognition" in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = "sv-SE";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = async (event) => {
+        const prompt = event.results[0][0].transcript;
+        responseEl.textContent = "Du sa: " + prompt + "\nTänker...";
+        await sendToAI(prompt);
+      };
+
+      recognition.onerror = (err) => {
+        responseEl.textContent = "Fel: " + err.error;
+      };
+    } else {
+      responseEl.textContent = "Din webbläsare stöder inte röstigenkänning 😕";
+    }
+
+    talkBtn.addEventListener("click", () => {
+      if (!recognition) return;
+      if (!listening) {
+        recognition.start();
+        listening = true;
+        talkBtn.textContent = "🎧 Lyssnar...";
+      } else {
+        recognition.stop();
+        listening = false;
+        talkBtn.textContent = "🎙️ Tryck för att prata";
+      }
+    });
+
+    async function sendToAI(prompt) {
       try {
         const res = await fetch("/api/demo", {
           method: "POST",
@@ -31,26 +137,11 @@
           body: JSON.stringify({ prompt })
         });
         const data = await res.json();
-        responseEl.textContent = data.message;
+        responseEl.textContent = "🤖 " + data.message;
       } catch (err) {
-        console.error(err);
-        responseEl.textContent = "Error: " + err.message;
+        responseEl.textContent = "Fel: " + err.message;
       }
-    });
-
-    // Event for demo button calling /api/demo with a predefined demo prompt
-    document.getElementById("demoBtn").addEventListener("click", async () => {
-      const responseEl = document.getElementById("response");
-
-      try {
-        const res = await fetch("/api/demo");
-        const data = await res.json();
-        responseEl.textContent = data.message;
-      } catch (err) {
-        console.error(err);
-        responseEl.textContent = "Error: " + err.message;
-      }
-    });
+    }
   </script>
 </body>
 </html>
