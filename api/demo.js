@@ -1,20 +1,25 @@
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPEN_AI_KEY, // Make sure your key in Vercel matches this
+  apiKey: process.env.OPEN_AI_KEY,
 });
 
 export default async function handler(req, res) {
-  try {
-    let userPrompt;
+  let userPrompt;
 
+  try {
     if (req.method === "POST") {
-      // ✅ Correct way: read the parsed body
-      const { prompt } = req.body || {};
-      userPrompt = prompt;
+      // Make sure to parse JSON properly
+      const body = await new Promise((resolve, reject) => {
+        let data = "";
+        req.on("data", chunk => (data += chunk));
+        req.on("end", () => resolve(JSON.parse(data || "{}")));
+        req.on("error", reject);
+      });
+      userPrompt = body.prompt;
     }
 
-    // Default demo prompt if nothing provided
+    // Fallback demo text
     if (!userPrompt) {
       userPrompt = "Hej! Detta är en demo för din AI-röstassistent.";
     }
@@ -23,7 +28,7 @@ export default async function handler(req, res) {
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: "Du är en hjälpsam AI-röstassistent för frisörsalonger." },
-        { role: "user", content: userPrompt }
+        { role: "user", content: userPrompt },
       ],
     });
 
